@@ -8,3 +8,12 @@ export const create = async (name: string) => {
     throw new DBException(err.code, err.message);
   }
 }
+
+export const read = async () => {
+  try {
+    const result = await connection.query("SELECT * FROM genres ORDER BY name ASC");
+    return result.rows;
+  } catch (err) {
+    throw err;
+  }
+}

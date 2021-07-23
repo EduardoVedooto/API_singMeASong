@@ -13,3 +13,16 @@ export const create = async (req: Request, res: Response) => {
     }
   }
 }
+
+export const read = async (req: Request, res: Response) => {
+  try {
+    const result = await genresService.read();
+    res.send(result);
+  } catch (err) {
+    if (err.status) res.status(err.status).send(err.message);
+    else {
+      console.error(err);
+      res.sendStatus(500);
+    }
+  }
+}

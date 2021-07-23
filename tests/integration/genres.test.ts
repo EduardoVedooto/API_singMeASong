@@ -28,4 +28,11 @@ describe("POST /genres", () => {
   });
 });
 
+describe("GET /genres", () => {
+  it("should returns status 200 when called", async () => {
+    const result = await agent.get("/genres");
+    expect(result.status).toBe(200);
+  });
+});
+
 afterAll(() => connection.end());

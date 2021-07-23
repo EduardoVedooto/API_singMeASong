@@ -14,3 +14,11 @@ export const create = async (body: IGenre) => {
     else throw err;
   }
 }
+
+export const read = async () => {
+  try {
+    return await genresRepository.read();
+  } catch (err) {
+    throw err;
+  }
+}
