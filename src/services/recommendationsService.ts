@@ -1,7 +1,7 @@
 import HttpException from "../exceptions/HttpException";
 import * as recommendationsRepository from "../repositories/recommendationsRepository";
 import recommendationsSchema from "../schemas/recommendations.schema";
-import { IBody } from "../types/recommendationsTypes";
+import { IBody, IRecommendation } from "../types/recommendationsTypes";
 
 const insert = async (body: IBody) => {
   const validation = recommendationsSchema(body);
@@ -21,19 +21,43 @@ const handleVote = async (type: string, id: string) => {
 
     const score = await recommendationsRepository.getScoreById(id);
 
+    if (score === undefined) throw new HttpException(404, `Recommendation not founded. ID (${id}) invalid.`);
+
     if (type.includes("upvote")) {
-      recommendationsRepository.updateScore(id, score + 1);
+      await recommendationsRepository.updateScore(id, score + 1);
     } else {
       if (score - 1 < -5) {
-        recommendationsRepository.removeRecommendation(id);
+        await recommendationsRepository.removeRecommendation(id);
       } else {
-        recommendationsRepository.updateScore(id, score - 1);
+        await recommendationsRepository.updateScore(id, score - 1);
       }
     }
   } catch (err) {
-    if (err.type === "NOT_FOUNDED") throw new HttpException(404, err.message);
-    else throw err;
+    throw err;
   }
 }
 
-export { insert, handleVote };
+const generateRandom = async () => {
+  const random = Math.trunc(Math.random() * 10); // Get a number between 1 to 10
+
+  const rowCount = await recommendationsRepository.rowCount();
+  if (rowCount === 0) throw new HttpException(404, "Recommendations list is empty");
+
+  let result: IRecommendation;
+
+  // 30%
+  if (random <= 3) {
+    result = await recommendationsRepository.lowerOrEqualThan10();
+    if (!result) return recommendationsRepository.greaterThan10();
+    else return result;
+  }
+
+  // 70%
+  else {
+    result = await recommendationsRepository.greaterThan10();
+    if (!result) return recommendationsRepository.lowerOrEqualThan10();
+    else return result;
+  }
+}
+
+export { insert, handleVote, generateRandom };

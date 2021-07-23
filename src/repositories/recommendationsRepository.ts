@@ -1,5 +1,5 @@
 import connection from "../database";
-import DBException from "../exceptions/DBException";
+import { IRecommendation } from "../types/recommendationsTypes";
 
 const insert = async (name: string, youtubeLink: string) => {
   try {
@@ -16,8 +16,7 @@ const insert = async (name: string, youtubeLink: string) => {
 const getScoreById = async (id: string) => {
   try {
     const result = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
-    if (!result.rowCount) throw new DBException("NOT_FOUNDED", `Recommendation not founded. ID (${id}) invalid.`);
-    return result.rows[0].score;
+    return result.rows[0]?.score;
   } catch (err) {
     throw err;
   }
@@ -39,4 +38,52 @@ const removeRecommendation = async (id: string) => {
   }
 }
 
-export { insert, getScoreById, updateScore, removeRecommendation };
+const lowerOrEqualThan10 = async (): Promise<IRecommendation> => {
+  try {
+    const result = await connection.query(`
+      SELECT * 
+      FROM recommendations 
+      WHERE score <= 10 
+      ORDER BY RANDOM() 
+      LIMIT 1
+    `);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
+}
+
+const greaterThan10 = async (): Promise<IRecommendation> => {
+  try {
+    const result = await connection.query(`
+      SELECT * 
+      FROM recommendations 
+      WHERE score > 10 
+      ORDER BY RANDOM() 
+      LIMIT 1
+    `);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
+}
+
+const rowCount = async () => {
+  try {
+    const result = await connection.query("SELECT * FROM recommendations");
+    return result.rowCount;
+  } catch (err) {
+    throw err;
+  }
+
+}
+
+export {
+  insert,
+  getScoreById,
+  updateScore,
+  removeRecommendation,
+  lowerOrEqualThan10,
+  greaterThan10,
+  rowCount
+};

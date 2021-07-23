@@ -6,7 +6,7 @@ const insert = async (req: Request, res: Response) => {
     await recommendationsService.insert(req.body);
     res.sendStatus(201);
   } catch (err) {
-    if (err.status === 400) return res.status(400).send(err.message);
+    if (err.status) return res.status(err.status).send(err.message);
     else {
       console.error(err);
       res.sendStatus(500);
@@ -27,4 +27,15 @@ const vote = async (req: Request, res: Response) => {
   }
 }
 
-export { insert, vote };
+const random = async (req: Request, res: Response) => {
+  try {
+    const result = await recommendationsService.generateRandom();
+    res.send(result);
+  } catch (err) {
+    if (err.status) return res.status(err.status).send(err.message);
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export { insert, vote, random };

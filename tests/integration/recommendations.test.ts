@@ -3,10 +3,10 @@ import supertest from "supertest";
 import app from "../../src/app";
 import connection from "../../src/database";
 import { body, createRecommendation } from "../factories/recommendationFactory";
+import wipeTable from "../utils/wipeTable";
+import { IRecommendation } from "../../src/types/recommendationsTypes";
 
 const agent = supertest(app);
-
-beforeEach(async () => await connection.query("TRUNCATE TABLE recommendations RESTART IDENTITY"));
 
 describe("POST /recommendations", () => {
   it("should returns status 400 when name is invalid", async () => {
@@ -26,7 +26,7 @@ describe("POST /recommendations", () => {
   });
 });
 
-describe("POST recommendation/upvote", () => {
+describe("POST upvote or downvote", () => {
   it("should returns status 400 when id is invalid", async () => {
     const response = await agent.post("/recommendations/id/upvote");
     expect(response.status).toBe(400);
@@ -38,11 +38,37 @@ describe("POST recommendation/upvote", () => {
   });
 
   it("should returns status 200 when id is valid", async () => {
+    await wipeTable();
     await createRecommendation()
     const response = await agent.post("/recommendations/1/upvote");
     expect(response.status).toBe(200);
     expect(response.text).toBe("OK");
   });
 });
+
+describe("GET /recommendations/random", () => {
+  it("should returns status 200 when called", async () => {
+    await createRecommendation();
+    const result = await agent.get("/recommendations/random");
+    expect(result.status).toBe(200);
+  });
+
+  it("should returns a body with the following keys: id, name, youtubeLink, score.", async () => {
+    await createRecommendation();
+    const result = await agent.get("/recommendations/random");
+    const recommendation: IRecommendation = result.body;
+    expect(recommendation).toHaveProperty("id");
+    expect(recommendation).toHaveProperty("name");
+    expect(recommendation).toHaveProperty("youtubeLink");
+    expect(recommendation).toHaveProperty("score");
+  });
+
+  it("should returns status 404 when recommendations list is empty", async () => {
+    await wipeTable();
+    const result = await agent.get("/recommendations/random");
+    expect(result.status).toBe(404);
+  });
+});
+
 
 afterAll(() => connection.end());
