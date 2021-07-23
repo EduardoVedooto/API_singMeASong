@@ -1,10 +1,10 @@
 class DBException extends Error {
-  type: string;
+  code: string;
   message: string;
 
-  constructor(type: string, message: string) {
+  constructor(code: string, message: string) {
     super(message);
-    this.type = type;
+    this.code = code;
     this.message = message;
   }
 }

@@ -8,6 +8,8 @@ import { IRecommendation } from "../../src/types/recommendationsTypes";
 
 const agent = supertest(app);
 
+beforeAll(() => wipeTable("recommendations"));
+
 describe("POST /recommendations", () => {
   it("should returns status 400 when name is invalid", async () => {
     const response = await agent.post("/recommendations").send({ ...body, name: "" });
@@ -38,7 +40,7 @@ describe("POST upvote or downvote", () => {
   });
 
   it("should returns status 200 when id is valid", async () => {
-    await wipeTable();
+    await wipeTable("recommendations");
     await createRecommendation()
     const response = await agent.post("/recommendations/1/upvote");
     expect(response.status).toBe(200);
@@ -64,7 +66,7 @@ describe("GET /recommendations/random", () => {
   });
 
   it("should returns status 404 when recommendations list is empty", async () => {
-    await wipeTable();
+    await wipeTable("recommendations");
     const result = await agent.get("/recommendations/random");
     expect(result.status).toBe(404);
   });
@@ -84,7 +86,7 @@ describe("GET /recommendations/top/:amount", () => {
   });
 
   it("should returns status 404 when recommendations list is empty", async () => {
-    await wipeTable();
+    await wipeTable("recommendations");
     const result = await agent.get("/recommendations/top/2");
     expect(result.status).toBe(404);
   });

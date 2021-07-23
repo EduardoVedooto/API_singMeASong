@@ -1,14 +1,13 @@
-import supertest from "supertest";
 import connection from "../../src/database";
 import faker from "faker";
-import app from "../../src/app";
+import { IBody } from "../../src/types/recommendationsTypes";
 
-const body = {
+export const body: IBody = {
   name: faker.lorem.sentence(Math.floor(Math.random() * (5 - 2) + 2)),
-  youtubeLink: "https://www.youtube.com/watch?v=GUeYTWXn0Qk"
+  youtubeLink: "https://www.youtube.com/watch?v=GUeYTWXn0Qk",
 }
 
-const createRecommendation = async (score?: number) => {
+export const createRecommendation = async (score?: number) => {
   try {
     await connection.query(`
     INSERT INTO recommendations 
@@ -20,5 +19,3 @@ const createRecommendation = async (score?: number) => {
     throw err;
   }
 }
-
-export { createRecommendation, body };
