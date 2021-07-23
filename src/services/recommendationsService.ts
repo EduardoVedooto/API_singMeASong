@@ -52,18 +52,22 @@ export const generateRandom = async () => {
 
   let result: IRecommendation;
 
-  // 30%
-  if (random <= 3) {
-    result = await recommendationsRepository.lowerOrEqualThan10();
-    if (!result) return recommendationsRepository.greaterThan10();
-    else return result;
-  }
+  try {
+    // 30%
+    if (random <= 3) {
+      result = await recommendationsRepository.lowerOrEqualThan10();
+      if (!result) return recommendationsRepository.greaterThan10();
+      else return result;
+    }
 
-  // 70%
-  else {
-    result = await recommendationsRepository.greaterThan10();
-    if (!result) return recommendationsRepository.lowerOrEqualThan10();
-    else return result;
+    // 70%
+    else {
+      result = await recommendationsRepository.greaterThan10();
+      if (!result) return recommendationsRepository.lowerOrEqualThan10();
+      else return result;
+    }
+  } catch (err) {
+    throw err;
   }
 }
 
