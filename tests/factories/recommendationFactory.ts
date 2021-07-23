@@ -8,8 +8,17 @@ const body = {
   youtubeLink: "https://www.youtube.com/watch?v=GUeYTWXn0Qk"
 }
 
-const createRecommendation = async () => {
-  await supertest(app).post("/recommendations").send(body);
+const createRecommendation = async (score?: number) => {
+  try {
+    await connection.query(`
+    INSERT INTO recommendations 
+    (name, "youtubeLink", score)
+    VALUES ($1, $2, $3)
+  `, [body.name, body.youtubeLink, score || 0]);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 export { createRecommendation, body };

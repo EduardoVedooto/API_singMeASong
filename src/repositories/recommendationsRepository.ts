@@ -1,7 +1,7 @@
 import connection from "../database";
 import { IRecommendation } from "../types/recommendationsTypes";
 
-const insert = async (name: string, youtubeLink: string) => {
+export const insert = async (name: string, youtubeLink: string) => {
   try {
     await connection.query(`
       INSERT INTO recommendations 
@@ -13,7 +13,7 @@ const insert = async (name: string, youtubeLink: string) => {
   }
 }
 
-const getScoreById = async (id: string) => {
+export const getScoreById = async (id: string) => {
   try {
     const result = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
     return result.rows[0]?.score;
@@ -22,7 +22,7 @@ const getScoreById = async (id: string) => {
   }
 }
 
-const updateScore = async (id: string, score: number) => {
+export const updateScore = async (id: string, score: number) => {
   try {
     await connection.query(`UPDATE recommendations SET score = $1 WHERE id = $2`, [score, id]);
   } catch (err) {
@@ -30,7 +30,7 @@ const updateScore = async (id: string, score: number) => {
   }
 }
 
-const removeRecommendation = async (id: string) => {
+export const removeRecommendation = async (id: string) => {
   try {
     await connection.query(`DELETE FROM recommendations WHERE id = $1`, [id]);
   } catch (err) {
@@ -38,7 +38,7 @@ const removeRecommendation = async (id: string) => {
   }
 }
 
-const lowerOrEqualThan10 = async (): Promise<IRecommendation> => {
+export const lowerOrEqualThan10 = async (): Promise<IRecommendation> => {
   try {
     const result = await connection.query(`
       SELECT * 
@@ -53,7 +53,7 @@ const lowerOrEqualThan10 = async (): Promise<IRecommendation> => {
   }
 }
 
-const greaterThan10 = async (): Promise<IRecommendation> => {
+export const greaterThan10 = async (): Promise<IRecommendation> => {
   try {
     const result = await connection.query(`
       SELECT * 
@@ -68,22 +68,22 @@ const greaterThan10 = async (): Promise<IRecommendation> => {
   }
 }
 
-const rowCount = async () => {
+export const rowCount = async () => {
   try {
     const result = await connection.query("SELECT * FROM recommendations");
     return result.rowCount;
   } catch (err) {
     throw err;
   }
-
 }
 
-export {
-  insert,
-  getScoreById,
-  updateScore,
-  removeRecommendation,
-  lowerOrEqualThan10,
-  greaterThan10,
-  rowCount
-};
+export const getTopRank = async (offset: number) => {
+  try {
+    const result = await connection.query(`
+      SELECT * FROM recommendations ORDER BY score DESC LIMIT $1
+    `, [offset]);
+    return result.rows;
+  } catch (err) {
+    throw err;
+  }
+}

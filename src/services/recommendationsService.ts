@@ -3,7 +3,7 @@ import * as recommendationsRepository from "../repositories/recommendationsRepos
 import recommendationsSchema from "../schemas/recommendations.schema";
 import { IBody, IRecommendation } from "../types/recommendationsTypes";
 
-const insert = async (body: IBody) => {
+export const insert = async (body: IBody) => {
   const validation = recommendationsSchema(body);
   if (validation.error) throw new HttpException(400, validation.error.details[0].message);
 
@@ -15,7 +15,7 @@ const insert = async (body: IBody) => {
   }
 }
 
-const handleVote = async (type: string, id: string) => {
+export const handleVote = async (type: string, id: string) => {
   try {
     if (!Number(id)) throw new HttpException(400, `ID invalid [${id}]. It must contains only numbers.`);
 
@@ -37,7 +37,7 @@ const handleVote = async (type: string, id: string) => {
   }
 }
 
-const generateRandom = async () => {
+export const generateRandom = async () => {
   const random = Math.trunc(Math.random() * 10); // Get a number between 1 to 10
 
   const rowCount = await recommendationsRepository.rowCount();
@@ -60,4 +60,13 @@ const generateRandom = async () => {
   }
 }
 
-export { insert, handleVote, generateRandom };
+export const topRank = async (offset: string) => {
+  try {
+    if (!Number(offset) || Number(offset) < 1)
+      throw new HttpException(400, `Amount invalid (${offset}). It must be a positive integer.`);
+
+    const result = await recommendationsRepository.getTopRank(Number(offset));
+    if (!result.length) throw new HttpException(404, `Recommendations list is empty`);
+    return result;
+  } catch (err) { throw err }
+}

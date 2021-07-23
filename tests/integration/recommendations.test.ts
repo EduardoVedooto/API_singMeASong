@@ -70,5 +70,29 @@ describe("GET /recommendations/random", () => {
   });
 });
 
+describe("GET /recommendations/top/:amount", () => {
+  it("should returns status 200 when called", async () => {
+    for (let i = 0; i < 5; i++) await createRecommendation(i * 10);
+    const result = await agent.get("/recommendations/top/2");
+    expect(result.status).toBe(200);
+  });
+
+  it("should returns a body containing a array with length equals or lower than the amount", async () => {
+    for (let i = 0; i < 5; i++) await createRecommendation(i * 10);
+    const result = await agent.get("/recommendations/top/2");
+    expect(result.body.length).toBeLessThanOrEqual(2);
+  });
+
+  it("should returns status 404 when recommendations list is empty", async () => {
+    await wipeTable();
+    const result = await agent.get("/recommendations/top/2");
+    expect(result.status).toBe(404);
+  });
+
+  it("should returns status 400 when amount value is invalid or negative", async () => {
+    const result = await agent.get("/recommendations/top/invalid");
+    expect(result.status).toBe(400);
+  });
+});
 
 afterAll(() => connection.end());

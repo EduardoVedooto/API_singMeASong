@@ -11,5 +11,6 @@ app.post("/recommendations", recommendationController.insert);
 app.post("/recommendations/:id/upvote", recommendationController.vote);
 app.post("/recommendations/:id/downvote", recommendationController.vote);
 app.get("/recommendations/random", recommendationController.random);
+app.get("/recommendations/top/:amount", recommendationController.top);
 
 export default app;
