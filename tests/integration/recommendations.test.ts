@@ -21,6 +21,11 @@ describe("POST /recommendations", () => {
     expect(response.status).toBe(400);
   });
 
+  it("should returns status 400 when genres's array is invalid", async () => {
+    const response = await agent.post("/recommendations").send({ ...body, genresIds: ["invalid"] });
+    expect(response.status).toBe(400);
+  });
+
   it("should returns status 201 when body is valid", async () => {
     const response = await agent.post("/recommendations").send(body);
     expect(response.text).toBe("Created");

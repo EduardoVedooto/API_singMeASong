@@ -1,5 +1,6 @@
 export interface IBody {
   name: string,
+  genresIds: number[],
   youtubeLink: string
 }
 

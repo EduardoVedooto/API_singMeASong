@@ -8,8 +8,15 @@ export const insert = async (body: IBody) => {
   if (validation.error) throw new HttpException(400, validation.error.details[0].message);
 
   try {
-    const { name, youtubeLink } = body;
-    await recommendationsRepository.insert(name, youtubeLink);
+    const { name, youtubeLink, genresIds } = body;
+    const recommendationId: number = await recommendationsRepository.insert(name, youtubeLink);
+    genresIds.forEach(async genreId => {
+      try {
+        await recommendationsRepository.insertGenre(genreId, recommendationId)
+      } catch (err) {
+        throw err;
+      }
+    });
   } catch (err) {
     throw err;
   }

@@ -3,11 +3,13 @@ import { IRecommendation } from "../types/recommendationsTypes";
 
 export const insert = async (name: string, youtubeLink: string) => {
   try {
-    await connection.query(`
+    const result = await connection.query(`
       INSERT INTO recommendations 
       (name, "youtubeLink", score)
       VALUES ($1, $2, $3)
+      RETURNING id
     `, [name, youtubeLink, 0]);
+    return result.rows[0].id;
   } catch (err) {
     throw err;
   }
@@ -84,6 +86,18 @@ export const getTopRank = async (offset: number) => {
     `, [offset]);
     return result.rows;
   } catch (err) {
+    throw err;
+  }
+}
+
+export const insertGenre = async (genreId: number, recommendationId: number) => {
+  try {
+    await connection.query(`
+      INSERT INTO genres_recommendations ("genreId","recommendationId")
+      VALUES ($1,$2)
+    `, [genreId, recommendationId]);
+  } catch (err) {
+    console.error(err);
     throw err;
   }
 }
