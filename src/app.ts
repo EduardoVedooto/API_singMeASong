@@ -8,5 +8,7 @@ app.use(express.json());
 
 app.get("/test", (req, res) => res.send("OK!"));
 app.post("/recommendations", recommendationController.insert);
+app.post("/recommendations/:id/upvote", recommendationController.vote);
+app.post("/recommendations/:id/downvote", recommendationController.vote);
 
 export default app;

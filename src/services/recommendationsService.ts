@@ -15,4 +15,25 @@ const insert = async (body: IBody) => {
   }
 }
 
-export { insert };
+const handleVote = async (type: string, id: string) => {
+  try {
+    if (!Number(id)) throw new HttpException(400, `ID invalid [${id}]. It must contains only numbers.`);
+
+    const score = await recommendationsRepository.getScoreById(id);
+
+    if (type.includes("upvote")) {
+      recommendationsRepository.updateScore(id, score + 1);
+    } else {
+      if (score - 1 < -5) {
+        recommendationsRepository.removeRecommendation(id);
+      } else {
+        recommendationsRepository.updateScore(id, score - 1);
+      }
+    }
+  } catch (err) {
+    if (err.type === "NOT_FOUNDED") throw new HttpException(404, err.message);
+    else throw err;
+  }
+}
+
+export { insert, handleVote };
