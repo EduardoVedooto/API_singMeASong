@@ -1,5 +1,6 @@
 import connection from "../database";
 import DBException from "../exceptions/DBException";
+import { IGenre } from "../types/genresTypes";
 
 export const create = async (name: string) => {
   try {
@@ -9,7 +10,7 @@ export const create = async (name: string) => {
   }
 }
 
-export const read = async () => {
+export const read = async (): Promise<IGenre[]> => {
   try {
     const result = await connection.query("SELECT * FROM genres ORDER BY name ASC");
     return result.rows;

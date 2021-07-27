@@ -9,7 +9,7 @@ export const insert = async (body: IBody) => {
 
   try {
     const { name, youtubeLink, genresIds } = body;
-    const recommendationId: number = await recommendationsRepository.insert(name, youtubeLink);
+    const recommendationId = await recommendationsRepository.insert(name, youtubeLink);
     genresIds.forEach(async genreId => {
       try {
         await recommendationsRepository.insertGenre(genreId, recommendationId)

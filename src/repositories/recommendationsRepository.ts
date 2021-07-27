@@ -1,7 +1,7 @@
 import connection from "../database";
 import { IRecommendation } from "../types/recommendationsTypes";
 
-export const insert = async (name: string, youtubeLink: string) => {
+export const insert = async (name: string, youtubeLink: string): Promise<number> => {
   try {
     const result = await connection.query(`
       INSERT INTO recommendations 
@@ -15,7 +15,7 @@ export const insert = async (name: string, youtubeLink: string) => {
   }
 }
 
-export const getScoreById = async (id: string) => {
+export const getScoreById = async (id: string): Promise<undefined | number> => {
   try {
     const result = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
     return result.rows[0]?.score;
@@ -70,7 +70,7 @@ export const greaterThan10 = async (): Promise<IRecommendation> => {
   }
 }
 
-export const rowCount = async () => {
+export const rowCount = async (): Promise<number> => {
   try {
     const result = await connection.query("SELECT * FROM recommendations");
     return result.rowCount;
@@ -79,7 +79,7 @@ export const rowCount = async () => {
   }
 }
 
-export const getTopRank = async (offset: number) => {
+export const getTopRank = async (offset: number): Promise<IRecommendation[]> => {
   try {
     const result = await connection.query(`
       SELECT * FROM recommendations ORDER BY score DESC LIMIT $1

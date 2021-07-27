@@ -15,7 +15,7 @@ export const create = async (body: IGenre) => {
   }
 }
 
-export const read = async () => {
+export const read = async (): Promise<IGenre[]> => {
   try {
     return await genresRepository.read();
   } catch (err) {
